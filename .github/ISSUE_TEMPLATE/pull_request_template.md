@@ -1,5 +1,5 @@
 ---
-name: PR template
+name: pull_request_template
 about: Suggest an idea for this project
 title: "[FEAT] 기능 구현"
 labels: ''
