@@ -58,7 +58,7 @@ jobs:
         aws-region: ap-northeast-2
 
     - name: Upload to S3
-      run: aws s3 cp --region ap-northeast-2 ./mjuletter.zip s3://$S3_BUCKET_NAME/  # 수정: S3 버킷 이름 변수 사용
+      run: aws s3 cp --region ap-northeast-2 ./mjuletter.zip s3://mjuletter/  # 수정: S3 버킷 이름 변수 사용
 
     # Deploy
     - name: Deploy
@@ -70,6 +70,6 @@ jobs:
         --application-name mjuletter \
         --deployment-group-name mjuletter-group \
         --file-exists-behavior OVERWRITE \
-        --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=mjuletter.zip \ 
+        --s3-location bucket=mjuletter,key=mjuletter.zip,bundleType=zip \ 
         --region ap-northeast-2
 
