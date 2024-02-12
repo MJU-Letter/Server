@@ -33,12 +33,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
-        // 로그인 중인 서비스(구글, 네이버 등)를 식별합니다.
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
         // OAuth2 로그인 진행 시 사용되는 필드 값(주로 Primary Key와 같은 의미)
         // 구글의 경우 기본적으로 'sub'를 사용
-        // 네이버, 카카오 등은 기본적으로 지원하지 않아 설정이 필요
         String userNameAttributeName = userRequest.getClientRegistration()
                 .getProviderDetails()
                 .getUserInfoEndpoint()

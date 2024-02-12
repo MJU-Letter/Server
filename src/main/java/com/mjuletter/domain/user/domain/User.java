@@ -47,7 +47,6 @@ public class User extends BaseEntity {
         this.classOf=classOf;
     }
 
-
     public User update(String name, String picture) {
         this.name = name;
         this.picture = picture;

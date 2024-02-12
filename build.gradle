@@ -40,9 +40,7 @@ dependencies {
     implementation 'jakarta.validation:jakarta.validation-api:2.0.2'
     implementation 'javax.servlet:javax.servlet-api:4.0.1'
 
-    //swagger
-    //implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
-
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 }
 
