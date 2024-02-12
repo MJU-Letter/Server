@@ -8,18 +8,20 @@ on:
 
 env:
   S3_BUCKET_NAME: mjuletter
+
 jobs:
   build:
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Repository
+      uses: actions/checkout@v2
     
     - name: Set up JDK 11
       uses: actions/setup-java@v2
       with:
-        java-version: '17'
+        java-version: '11'  # 수정: JDK 버전을 17에서 11로 변경
         distribution: 'temurin'
         
     - name: Grant execute permission for gradlew
@@ -40,7 +42,6 @@ jobs:
     - name: Copy appspec.yml
       run: cp appspec.yml ./deploy
 
-
     # script files 복사
     - name: Copy script
       run: cp ./scripts/*.sh ./deploy
@@ -57,9 +58,7 @@ jobs:
         aws-region: ap-northeast-2
 
     - name: Upload to S3
-      run: aws s3 cp --region ap-northeast-2 ./mjuletter.zip s3://mjuletter/
-
-
+      run: aws s3 cp --region ap-northeast-2 ./mjuletter.zip s3://$S3_BUCKET_NAME/  # 수정: S3 버킷 이름 변수 사용
 
     # Deploy
     - name: Deploy
@@ -71,5 +70,6 @@ jobs:
         --application-name mjuletter \
         --deployment-group-name mjuletter-group \
         --file-exists-behavior OVERWRITE \
-        --s3-location bucket=cointalk-deploy mjuletter,bundleType=zip,key=mjuletter.zip \ 
+        --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=mjuletter.zip \ 
         --region ap-northeast-2
+
