@@ -1,24 +1,23 @@
 package com.mjuletter.global.auth.presentation;
 
-import com.mjuletter.domain.user.domain.User;
-import com.mjuletter.domain.user.domain.repository.UserRepository;
-import com.mjuletter.global.auth.dto.request.GoogleRequest;
-import com.mjuletter.global.auth.dto.response.GoogleInfoResponse;
-import com.mjuletter.global.auth.dto.response.GoogleResponse;
-import jakarta.servlet.http.HttpServletResponse;
+import com.mjuletter.global.auth.dto.request.GoogleOAuthRequest;
+import com.mjuletter.global.auth.dto.response.GoogleLoginResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
+import java.net.URI;
 @RestController
 @CrossOrigin("*")
+@Slf4j
+@RequiredArgsConstructor
 public class AuthController {
+
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
 
@@ -29,73 +28,54 @@ public class AuthController {
     private String googleRedirectUrl;
 
     @GetMapping("/api/v1/oauth2/google")
-    public void loginUrlGoogle(HttpServletResponse response) throws IOException {
+    public ResponseEntity<Object> loginUrlGoogle(@RequestHeader(value = "User-Agent") String userAgent) throws IOException {
         String reqUrl = "https://accounts.google.com/o/oauth2/v2/auth?" +
                 "client_id=" + googleClientId +
                 "&redirect_uri=" + googleRedirectUrl +
-                "&response_type=code&scope=email%20profile%20openid&access_type=offline";
+                "&response_type=code&scope=email%20profile&access_type=offline";
 
-        // Redirect
-        response.sendRedirect(reqUrl);
+        log.info("myLog-ClientId : {}", googleClientId);
+        log.info("myLog-RedirectUrl : {}", googleRedirectUrl);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(reqUrl));
+
+        log.info("headers : {}", headers);
+        // 1.reqUrl 구글로그인 창을 띄우고, 로그인 후 /login/oauth2/code/google 으로 리다이렉션하게 한다.
+//        return new ResponseEntity<>(headers, HttpStatus.MOVED_PERMANENTLY);
+        return new ResponseEntity<>(headers,HttpStatus.MOVED_PERMANENTLY);
     }
 
-    @PostMapping("/api/v1/oauth2/google")
-    public String loginGoogle(@RequestParam("code") String authCode) {
-        try {
-            RestTemplate restTemplate = new RestTemplate();
+    @GetMapping(value = "/login/oauth2/code/google")
+    public String oauth_google_check(@RequestParam(value = "code") String authCode){
 
-            // Google OAuth Token 발급 요청
-            GoogleRequest googleOAuthRequestParam = GoogleRequest
+
+
+            // 2.구글에 등록된 레드망고 설정정보를 보내어 약속된 토큰을 받위한 객체 생성
+            GoogleOAuthRequest googleOAuthRequest = GoogleOAuthRequest
                     .builder()
                     .clientId(googleClientId)
                     .clientSecret(googleClientSecret)
                     .code(authCode)
                     .redirectUri(googleRedirectUrl)
-                    .grantType("authorization_code").build();
-            ResponseEntity<GoogleResponse> resultEntity = restTemplate.postForEntity(
-                    "https://oauth2.googleapis.com/token",
-                    googleOAuthRequestParam, GoogleResponse.class);
+                    .grantType("authorization_code")
+                    .build();
 
-            String accessToken = resultEntity.getBody().getAccess_token();
+            RestTemplate restTemplate = new RestTemplate();
 
-            // 로그 추가: 획득한 Access Token을 출력
-            System.out.println("Access Token: " + accessToken);
+            // 3.토큰요청을 한다.
+            ResponseEntity<GoogleLoginResponse> apiResponse = restTemplate.postForEntity("https://oauth2.googleapis.com/token", googleOAuthRequest, GoogleLoginResponse.class);
+            // 4.받은 토큰을 토큰객체에 저장
+            GoogleLoginResponse googleLoginResponse = apiResponse.getBody();
 
-            // TODO: 여기서 획득한 Access Token을 이용하여 사용자 정보를 처리하는 로직 추가
-            // 획득한 Access Token을 사용하여 필요한 작업을 수행하면 됩니다.
+            log.info("responseBody {}", googleLoginResponse.toString());
 
-            // Google의 UserInfo 엔드포인트에 Access Token을 사용하여 사용자 정보를 요청
-            Map<String, String> userInfoParams = new HashMap<>();
-            userInfoParams.put("access_token", accessToken);
-            ResponseEntity<GoogleInfoResponse> resultEntity2 = restTemplate.getForEntity(
-                    "https://www.googleapis.com/oauth2/v2/userinfo?access_token={access_token}",
-                    GoogleInfoResponse.class, userInfoParams);
+            String googleToken = googleLoginResponse.getId_token();
 
-            String email = resultEntity2.getBody().getEmail();
+            // 5.받은 토큰을 구글에 보내 유저정보를 얻는다.
+            // 6.허가된 토큰의 유저정보를 결과로 받는다.
+            String requestUrl = UriComponentsBuilder.fromHttpUrl("https://www.googleapis.com/oauth2/v3/tokeninfo").queryParam("id_token", googleToken).toUriString();
+            String userInfo = restTemplate.getForObject(requestUrl, String.class);
 
-            // 로그 추가: 획득한 Email을 출력
-            System.out.println("Email: " + email);
-
-            // TODO: 이후에 email 등의 사용자 정보를 처리하는 로직 추가
-            // 예시: DB에 해당 이메일을 가지는 사용자가 있는지 확인하고, 없다면 새로운 사용자로 등록
-//        Optional<User> existingUser = userRepository.findByEmail(email);
-//        if (existingUser.isPresent()) {
-//            // 이미 등록된 사용자
-//            // TODO: 사용자 정보에 따른 처리 추가
-//        } else {
-//            // 새로운 사용자 등록
-//            User newUser = new User(); // 사용자 정보를 적절히 채워서
-//            userRepository.save(newUser);
-//            // TODO: 새로운 사용자 등록에 따른 처리 추가
-//        }
-
-            return email;
-        } catch (Exception e) {
-            // 예외 처리
-            e.printStackTrace();
-            return "Error occurred: " + e.getMessage();
-        }
+            return userInfo;
     }
-
-
 }
