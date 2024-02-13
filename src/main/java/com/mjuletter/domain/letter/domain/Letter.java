@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+
 @Entity
 @Table(name="Letter")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -19,6 +20,9 @@ public class Letter extends BaseEntity {
 
     @Column(name="content")
     private String content;
+
+    @Column(name="writer_id")
+    private Long userId;
 
     @Builder
     public Letter(String content){
