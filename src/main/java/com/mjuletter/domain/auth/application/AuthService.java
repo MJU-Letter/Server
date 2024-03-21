@@ -3,14 +3,12 @@ package com.mjuletter.domain.auth.application;
 import com.mjuletter.domain.auth.domain.Token;
 import com.mjuletter.domain.auth.domain.repository.TokenRepository;
 import com.mjuletter.domain.auth.dto.*;
-import com.mjuletter.domain.user.domain.Provider;
 import com.mjuletter.domain.user.domain.Role;
 import com.mjuletter.domain.user.domain.User;
 import com.mjuletter.domain.user.domain.repository.UserRepository;
 import com.mjuletter.global.DefaultAssert;
 import com.mjuletter.global.config.security.token.UserPrincipal;
 import com.mjuletter.global.payload.ApiResponse;
-import com.mjuletter.global.payload.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +32,30 @@ public class AuthService {
 
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
+
+    @Transactional
+    public ResponseEntity<?> signUp(SignUpReq signUpReq) {
+
+        User user = User.builder()
+                .email(signUpReq.getEmail())
+                .password(passwordEncoder.encode(signUpReq.getPassword()))
+                .name(signUpReq.getName())
+                .major(signUpReq.getMajor())
+                .classOf(signUpReq.getClassOf())
+                .picture(signUpReq.getPicture())
+                .instagram(signUpReq.getInstagram())
+                .role(Role.USER)
+                .build();
+
+        userRepository.save(user);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information("회원가입이 완료되었습니다.")
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
 
     @Transactional
     public ResponseEntity<?> refresh(RefreshTokenReq tokenRefreshRequest){
@@ -87,49 +109,6 @@ public class AuthService {
     }
 
 
-    // 회원가입 로직: 구글로그인(1) - 학생카드(2) - 사진,인스타 업데이트(3)
-    // (3)번 로직
-    @Transactional
-    public ResponseEntity<?> signUp(SignUpReq signUpReq) {
-
-        User user = userRepository.findByEmail(signUpReq.getEmail()).orElseThrow();
-
-        user.update(signUpReq.getInstagram(), passwordEncoder.encode(signUpReq.getProviderId()));
-        if (signUpReq.getPicture() != null ) {
-            user.updatePicture(signUpReq.getPicture());
-        }
-
-        userRepository.save(user);
-
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        signUpReq.getEmail(),
-                        user.getProviderId()
-                )
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        TokenMapping tokenMapping = customTokenProviderService.createToken(authentication);
-        Token token = Token.builder()
-                .refreshToken(tokenMapping.getRefreshToken())
-                .userEmail(tokenMapping.getUserEmail())
-                .build();
-        tokenRepository.save(token);
-
-        AuthRes authRes = AuthRes.builder()
-                .accessToken(tokenMapping.getAccessToken())
-                .refreshToken(tokenMapping.getRefreshToken())
-                .build();
-
-        ApiResponse apiResponse = ApiResponse.builder()
-                .check(true)
-                .information(authRes)
-                .build();
-
-        return ResponseEntity.ok(apiResponse);
-    }
-
     private boolean valid(String refreshToken){
 
         //1. 토큰 형식 물리적 검증
@@ -151,7 +130,7 @@ public class AuthService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         signInReq.getEmail(),
-                        signInReq.getProviderId()
+                        signInReq.getPassword()
                 )
         );
 
@@ -176,5 +155,12 @@ public class AuthService {
         return ResponseEntity.ok(apiResponse);
     }
 
+    public ResponseEntity<?> checkEmailDuplicate(String email) {
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(userRepository.existsByEmail(email)).build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
 
 }

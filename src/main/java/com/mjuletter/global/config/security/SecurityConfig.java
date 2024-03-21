@@ -1,7 +1,6 @@
 package com.mjuletter.global.config.security;
 
 
-import com.mjuletter.domain.auth.application.CustomDefaultOAuth2UserService;
 import com.mjuletter.domain.auth.application.CustomUserDetailsService;
 import com.mjuletter.domain.auth.domain.repository.CustomAuthorizationRequestRepository;
 import com.mjuletter.global.config.security.handler.CustomSimpleUrlAuthenticationFailureHandler;
@@ -20,7 +19,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.DefaultSecurityFilterChain;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static org.springframework.security.config.Customizer.*;
@@ -32,7 +31,6 @@ import static org.springframework.security.config.Customizer.*;
 public class SecurityConfig{
 
     private final CustomUserDetailsService customUserDetailsService;
-    private final CustomDefaultOAuth2UserService customOAuth2UserService;
     private final CustomSimpleUrlAuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final CustomSimpleUrlAuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
     private final CustomAuthorizationRequestRepository customAuthorizationRequestRepository;
@@ -62,7 +60,8 @@ public class SecurityConfig{
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    protected DefaultSecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -75,20 +74,10 @@ public class SecurityConfig{
                         .permitAll()
                         .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**")
                         .permitAll()
-                        .requestMatchers("/login/**", "/auth/**", "/oauth2/**", "api/**", "/api/v1/**")
+                        .requestMatchers("/auth/**")
                         .permitAll()
                         .anyRequest()
-                        .authenticated())
-                .oauth2Login(oauth2 -> oauth2
-                        .authorizationEndpoint(authorization -> authorization
-                                .baseUri("/oauth2/authorize")
-                                .authorizationRequestRepository(customAuthorizationRequestRepository))
-                        .redirectionEndpoint(redirection -> redirection
-                                .baseUri("/login/oauth2/code/google"))
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService))
-                        .successHandler(oAuth2AuthenticationSuccessHandler)
-                        .failureHandler(oAuth2AuthenticationFailureHandler));
+                        .authenticated());
 
         http.addFilterBefore(customOncePerRequestFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();

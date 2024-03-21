@@ -1,17 +1,25 @@
 package com.mjuletter.domain.auth.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
+import jakarta.validation.constraints.Email;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
-
-@Getter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SignUpReq {
-
-    private String providerId;
 
     @Email
     private String email;
+
+    private String password;
+
+    private String name;
+
+    private String major;
+
+    private int classOf;
 
     private String picture;
 

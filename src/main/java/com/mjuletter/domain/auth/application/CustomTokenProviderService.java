@@ -3,6 +3,7 @@ package com.mjuletter.domain.auth.application;
 import com.mjuletter.domain.auth.dto.TokenMapping;
 import com.mjuletter.global.config.security.OAuth2Config;
 import com.mjuletter.global.config.security.token.UserPrincipal;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,13 +20,12 @@ import java.util.Date;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CustomTokenProviderService {
 
-    @Autowired
-    private OAuth2Config oAuth2Config;
+    private final OAuth2Config oAuth2Config;
 
-    @Autowired
-    private CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
     public TokenMapping refreshToken(Authentication authentication, String refreshToken) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
@@ -53,7 +53,6 @@ public class CustomTokenProviderService {
 
     public TokenMapping createToken(Authentication authentication) {
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-
         Date now = new Date();
 
         Date accessTokenExpiresIn = new Date(now.getTime() + oAuth2Config.getAuth().getAccessTokenExpirationMsec());

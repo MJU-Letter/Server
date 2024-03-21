@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
-
 @Entity
 @Table(name="user")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -36,13 +34,6 @@ public class User extends BaseEntity {
     @Column(name="role")
     private Role role;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name="provider")
-    private Provider provider;
-
-    @Column(name="providerId", nullable = false)
-    private String providerId;
-
     @Column(name = "major")
     private String major;
 
@@ -53,7 +44,8 @@ public class User extends BaseEntity {
     private String instagram;
 
     @Builder
-    public User(String name, String email, String password, String picture, Role role, String major, int classOf, Provider provider, String providerId, String instagram) {
+    public User(Long id, String name, String email, String password, String picture, Role role, String major, int classOf, String instagram) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
@@ -61,30 +53,8 @@ public class User extends BaseEntity {
         this.role = role;
         this.major=major;
         this.classOf=classOf;
-        this.provider = provider;
-        this.providerId = providerId;
         this.instagram = instagram;
     }
-
-    public User update(String instagram, String password) {
-        this.instagram = instagram;
-        this.password = password;
-
-        return this;
-    }
-
-    public void updateMajor(String major){
-        this.major = major;
-    }
-
-    public void updateClassOf(int classOf){
-        this.classOf = classOf;
-    }
-
-    public void updatePicture(String picture){
-        this.picture = picture;
-    }
-
     public String getRoleKey() {
         return this.role.getKey();
     }
