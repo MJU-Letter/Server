@@ -1,6 +1,6 @@
 package com.mjuletter.domain.letter.domain;
 
-import com.mjuletter.global.common.BaseEntity;
+import com.mjuletter.domain.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="Letter")
+@Table(name="letter")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Letter extends BaseEntity {

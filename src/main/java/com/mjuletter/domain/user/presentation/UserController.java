@@ -1,19 +1,29 @@
 package com.mjuletter.domain.user.presentation;
 
-import com.mjuletter.global.auth.dto.SessionUser;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.mjuletter.domain.user.application.UserService;
+import com.mjuletter.global.config.security.token.CurrentUser;
+import com.mjuletter.global.config.security.token.UserPrincipal;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/user")
+@Tag(name = "User", description = "User API")
 public class UserController {
 
-    // @AuthenticationPrincipal 어노테이션을 사용하여 Principal 객체를 직접 주입받을 수 있습니다.
-    @GetMapping("/info")
-    public SessionUser getUserInfo(@AuthenticationPrincipal SessionUser sessionUser) {
-        // 세션에 저장된 사용자 정보인 SessionUser 객체를 반환합니다.
-        return sessionUser;
+    private final UserService userService;
+
+    @Operation(summary = "회원탈퇴", description = "회원탈퇴를 수행합니다.")
+    @DeleteMapping()
+    public ResponseEntity<?> deleteUser(@CurrentUser UserPrincipal userPrincipal) {
+        return userService.deleteUser(userPrincipal);
     }
+
 }
