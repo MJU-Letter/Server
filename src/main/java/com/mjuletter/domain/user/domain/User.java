@@ -43,8 +43,11 @@ public class User extends BaseEntity {
     @Column(name = "instagram")
     private String instagram;
 
+    @Column(name = "is_received_email")
+    private boolean isReceivedEmail;
+
     @Builder
-    public User(Long id, String name, String email, String password, String picture, Role role, String major, int classOf, String instagram) {
+    public User(Long id, String name, String email, String password, String picture, Role role, String major, int classOf, String instagram, boolean isReceivedEmail) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -54,9 +57,13 @@ public class User extends BaseEntity {
         this.major=major;
         this.classOf=classOf;
         this.instagram = instagram;
+        this.isReceivedEmail = isReceivedEmail;
     }
     public String getRoleKey() {
         return this.role.getKey();
     }
 
+    public void updateReceivedEmail(boolean receivedEmail) {
+        isReceivedEmail = receivedEmail;
+    }
 }

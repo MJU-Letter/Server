@@ -46,6 +46,7 @@ public class AuthService {
                 .picture(setPicture(signUpReq.getPicture()))
                 .instagram(signUpReq.getInstagram())
                 .role(Role.USER)
+                .isReceivedEmail(true)
                 .build();
 
         userRepository.save(user);
