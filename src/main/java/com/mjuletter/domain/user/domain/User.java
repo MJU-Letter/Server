@@ -18,26 +18,26 @@ public class User extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
-    @Column(name="name")
+    @Column(name="name", nullable = false)
     private String name;
 
     @Column(name="email", nullable = false)
     private String email;
 
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name="picture", nullable = false)
+    @Column(name="picture")
     private String picture;
 
     @Enumerated(EnumType.STRING) // Enum 타입은 문자열 형태로 저장해야 함
     @Column(name="role")
     private Role role;
 
-    @Column(name = "major")
+    @Column(name = "major", nullable = false)
     private String major;
 
-    @Column(name = "class_of")
+    @Column(name = "class_of", nullable = false)
     private int classOf;
 
     @Column(name = "instagram")
