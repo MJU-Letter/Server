@@ -1,6 +1,7 @@
 package com.mjuletter.domain.auth.presentation;
 
 import com.mjuletter.domain.auth.application.AuthService;
+import com.mjuletter.domain.auth.dto.CheckPasswordReq;
 import com.mjuletter.domain.auth.dto.RefreshTokenReq;
 import com.mjuletter.domain.auth.dto.SignInReq;
 import com.mjuletter.domain.auth.dto.SignUpReq;
@@ -51,5 +52,11 @@ public class AuthController {
     @GetMapping("/email")
     public ResponseEntity<?> checkEmailDuplicate(@RequestBody String email) {
         return authService.checkEmailDuplicate(email);
+    }
+
+    @Operation(summary = "비밀번호 재확인", description = "회원가입시 비밀번호를 재확인합니다.")
+    @GetMapping("/password")
+    public ResponseEntity<?> checkPassword(@RequestBody CheckPasswordReq checkPasswordReq) {
+        return authService.checkPassword(checkPasswordReq);
     }
 }

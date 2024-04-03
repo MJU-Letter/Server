@@ -7,10 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -21,9 +18,26 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "회원탈퇴", description = "회원탈퇴를 수행합니다.")
-    @DeleteMapping()
+    @DeleteMapping("/delete")
     public ResponseEntity<?> deleteUser(@CurrentUser UserPrincipal userPrincipal) {
         return userService.deleteUser(userPrincipal);
     }
 
+    @Operation(summary = "사용자 정보 조회", description = "마이페이지에서 사용자의 정보를 조회합니다.")
+    @GetMapping()
+    public ResponseEntity<?> getUserInfo(@CurrentUser UserPrincipal userPrincipal) {
+        return userService.getUserInfo(userPrincipal);
+    }
+
+    @Operation(summary = "이메일 수신 여부 변경", description = "이메일 수신 여부를 변경합니다.")
+    @PatchMapping("/received-email")
+    public ResponseEntity<?> updateReceivedEmail(@CurrentUser UserPrincipal userPrincipal, @RequestParam boolean isReceivedEmail) {
+        return userService.updateReceivedEmail(userPrincipal, isReceivedEmail);
+    }
+
+    @Operation(summary = "이메일 수신 여부 조회", description = "이메일 수신 여부를 조회합니다.")
+    @GetMapping("/received-email")
+    public ResponseEntity<?> getReceivedEmail(@CurrentUser UserPrincipal userPrincipal) {
+        return userService.getReceivedEmail(userPrincipal);
+    }
 }

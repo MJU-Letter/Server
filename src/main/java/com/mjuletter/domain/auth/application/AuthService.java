@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -42,9 +43,10 @@ public class AuthService {
                 .name(signUpReq.getName())
                 .major(signUpReq.getMajor())
                 .classOf(signUpReq.getClassOf())
-                .picture(signUpReq.getPicture())
+                .picture(setPicture(signUpReq.getPicture()))
                 .instagram(signUpReq.getInstagram())
                 .role(Role.USER)
+                .isReceivedEmail(true)
                 .build();
 
         userRepository.save(user);
@@ -55,6 +57,14 @@ public class AuthService {
                 .build();
 
         return ResponseEntity.ok(apiResponse);
+    }
+
+    private String setPicture(String picture) {
+        if (picture == null || picture.isEmpty()) {
+            return "resources/static/img/default_image.png";
+        } else {
+            return picture;
+        }
     }
 
     @Transactional
@@ -162,5 +172,19 @@ public class AuthService {
 
         return ResponseEntity.ok(apiResponse);
     }
+
+    public ResponseEntity<?> checkPassword(CheckPasswordReq checkPasswordReq) {
+        boolean isEqual = Objects.equals(checkPasswordReq.getPassword(), checkPasswordReq.getCheckPassword());
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .check(true)
+                .information(isEqual)
+                .build();
+
+        return ResponseEntity.ok(apiResponse);
+    }
+
+    // 이미지 업로드용 메소드
+    // "resources/static/img/default_image.png"
 
 }
