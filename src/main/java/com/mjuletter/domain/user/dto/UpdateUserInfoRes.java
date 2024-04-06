@@ -4,9 +4,11 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class UserInfoRes {
+public class UpdateUserInfoRes {
 
     private Long id;
+
+    private String email;
 
     private String name;
 
@@ -19,8 +21,9 @@ public class UserInfoRes {
     private String instagram;
 
     @Builder
-    public UserInfoRes(Long id, String name, String picture, String major, int classOf, String instagram) {
+    public UpdateUserInfoRes(Long id, String email, String name, String picture, String major, int classOf, String instagram) {
         this.id = id;
+        this.email = email;
         this.name = name;
         this.picture = picture;
         this.major = major;

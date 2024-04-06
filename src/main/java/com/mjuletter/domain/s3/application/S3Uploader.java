@@ -1,5 +1,6 @@
 package com.mjuletter.domain.s3.application;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
@@ -72,7 +73,12 @@ public class S3Uploader {
 
 
     public void deleteFile(String fileName) {
-        amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
+        try {
+            amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
+        } catch (AmazonServiceException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 삭제에 실패했습니다.");
+        }
+
     }
 
 
