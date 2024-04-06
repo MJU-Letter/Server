@@ -3,6 +3,7 @@ package com.mjuletter.domain.auth.application;
 import com.mjuletter.domain.auth.domain.Token;
 import com.mjuletter.domain.auth.domain.repository.TokenRepository;
 import com.mjuletter.domain.auth.dto.*;
+import com.mjuletter.domain.s3.application.S3Uploader;
 import com.mjuletter.domain.user.domain.Role;
 import com.mjuletter.domain.user.domain.User;
 import com.mjuletter.domain.user.domain.repository.UserRepository;
@@ -18,7 +19,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -30,12 +33,13 @@ public class AuthService {
     private final CustomTokenProviderService customTokenProviderService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final S3Uploader s3Uploader;
 
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
 
     @Transactional
-    public ResponseEntity<?> signUp(SignUpReq signUpReq) {
+    public ResponseEntity<?> signUp(SignUpReq signUpReq, MultipartFile picture) {
 
         User user = User.builder()
                 .email(signUpReq.getEmail())
@@ -43,7 +47,7 @@ public class AuthService {
                 .name(signUpReq.getName())
                 .major(signUpReq.getMajor())
                 .classOf(signUpReq.getClassOf())
-                .picture(setPicture(signUpReq.getPicture()))
+                .picture(setPicture(picture))
                 .instagram(signUpReq.getInstagram())
                 .role(Role.USER)
                 .isReceivedEmail(true)
@@ -59,11 +63,11 @@ public class AuthService {
         return ResponseEntity.ok(apiResponse);
     }
 
-    private String setPicture(String picture) {
+    private String setPicture(MultipartFile picture) {
         if (picture == null || picture.isEmpty()) {
-            return "resources/static/img/default_image.png";
+            return "/img/default_image.png";
         } else {
-            return picture;
+            return s3Uploader.uploadImage(picture);
         }
     }
 

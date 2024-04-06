@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Tag(name = "Authorization", description = "Authorization API")
@@ -25,9 +26,10 @@ public class AuthController {
 
     @Operation(summary = "회원가입", description = "회원가입을 수행합니다.")
     @PostMapping("/sign-up")
-    public ResponseEntity<?> signUp(@RequestBody SignUpReq signUpReq) {
+    public ResponseEntity<?> signUp(@RequestPart SignUpReq signUpReq,
+                                    @RequestPart MultipartFile picture) {
 
-        return authService.signUp(signUpReq);
+        return authService.signUp(signUpReq, picture);
     }
 
     @Operation(summary = "로그인", description = "로그인을 수행합니다.")
