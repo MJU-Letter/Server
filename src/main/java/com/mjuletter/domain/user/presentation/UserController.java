@@ -20,7 +20,7 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "사용자 정보 수정", description = "사용자의 정보를 수정합니다.")
-    @DeleteMapping("/update")
+    @PatchMapping("/update")
     public ResponseEntity<?> updateUserInfo(@CurrentUser UserPrincipal userPrincipal,
                                             @RequestPart UpdateUserInfoReq updateUserInfoReq,
                                             @RequestPart MultipartFile file) {

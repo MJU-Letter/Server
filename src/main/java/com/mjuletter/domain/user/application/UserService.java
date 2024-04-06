@@ -35,6 +35,11 @@ public class UserService {
         DefaultAssert.isTrue(user.isPresent(), "유저가 올바르지 않습니다.");
         User findUser = user.get();
 
+        if (findUser.getPictureType() == PictureType.CUSTOM) {
+            String originalFile = findUser.getPicture().split("amazonaws.com/")[1];
+            s3Uploader.deleteFile(originalFile);
+        }
+
         userRepository.delete(findUser);
 
         ApiResponse apiResponse = ApiResponse.builder()
@@ -69,34 +74,25 @@ public class UserService {
     }
 
     // 프로필 수정
+    @Transactional
     public ResponseEntity<?> updateUserInfo(UserPrincipal userPrincipal, UpdateUserInfoReq updateUserInfoReq, MultipartFile file) {
         Optional<User> user = userRepository.findById(userPrincipal.getId());
         DefaultAssert.isTrue(user.isPresent(), "유저가 올바르지 않습니다.");
         User findUser = user.get();
 
-        String instagram = updateUserInfoReq.getInstagram();
-        String updatePictureType = updateUserInfoReq.getPictureType();;
-
-        if (!instagram.isEmpty()) {
-            findUser.updateInstagram(instagram);
+        // 인스타그램 수정
+        if (updateUserInfoReq.getInstagram() != null) {
+            findUser.updateInstagram(updateUserInfoReq.getInstagram());
         }
-        if (Objects.equals(updatePictureType, PictureType.CUSTOM.toString())) {
-            // 사용자가 직접 프로필을 업로드하는 경우
-            s3Uploader.deleteFile(findUser.getPicture());
-            String picture = s3Uploader.uploadImage(file);
-
-            findUser.updatePictureType("CUSTOM");
-            findUser.updatePicture(picture);
-        } else if (Objects.equals(updatePictureType, PictureType.DEFAULT.toString())) {
-            // 사용자가 기본 프로필을 설정한 경우
-            findUser.updatePictureType("DEFAULT");
-            findUser.updatePicture("/img/default_image.png");
+        // 프로필 수정
+        if (updateUserInfoReq.getPictureType() != null) {
+            updateUserProfile(findUser, updateUserInfoReq.getPictureType(), file);
         }
 
         UpdateUserInfoRes updateUserInfoRes = UpdateUserInfoRes.builder()
                 .id(findUser.getId())
                 .picture(findUser.getPicture())
-                .name(file.getName())
+                .name(findUser.getName())
                 .major(findUser.getMajor())
                 .classOf(findUser.getClassOf())
                 .instagram(findUser.getInstagram())
@@ -111,6 +107,24 @@ public class UserService {
         return ResponseEntity.ok(apiResponse);
     }
 
+    private void updateUserProfile(User user, String type, MultipartFile file) {
+        if (Objects.equals(type, PictureType.CUSTOM.toString())) {
+            // 사용자가 직접 프로필을 업로드하는 경우
+            if (user.getPictureType() == PictureType.CUSTOM) {
+                String originalFile = user.getPicture().split("amazonaws.com/")[1];
+                s3Uploader.deleteFile(originalFile);
+            }
+            String picture = s3Uploader.uploadImage(file);
+
+            user.updatePictureType("CUSTOM");
+            user.updatePicture(picture);
+        }
+         else if (Objects.equals(type, PictureType.DEFAULT.toString())) {
+            // 사용자가 기본 프로필을 설정한 경우
+            user.updatePictureType("DEFAULT");
+            user.updatePicture("/img/default_image.png");
+        }
+    }
 
     // 이메일 알림 수신 허용
     @Transactional
