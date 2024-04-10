@@ -1,7 +1,6 @@
 package com.mjuletter.domain.user.application;
 
 import com.mjuletter.domain.s3.application.S3Uploader;
-import com.mjuletter.domain.user.domain.PictureType;
 import com.mjuletter.domain.user.domain.User;
 import com.mjuletter.domain.user.domain.repository.UserRepository;
 import com.mjuletter.domain.user.dto.UpdateUserInfoReq;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -35,7 +33,7 @@ public class UserService {
         DefaultAssert.isTrue(user.isPresent(), "유저가 올바르지 않습니다.");
         User findUser = user.get();
 
-        if (findUser.getPictureType() == PictureType.CUSTOM) {
+        if (!findUser.getPicture().contains("amazonaws.com/")) {
             String originalFile = findUser.getPicture().split("amazonaws.com/")[1];
             s3Uploader.deleteFile(originalFile);
         }
@@ -85,8 +83,8 @@ public class UserService {
             findUser.updateInstagram(updateUserInfoReq.getInstagram());
         }
         // 프로필 수정
-        if (updateUserInfoReq.getPictureType() != null) {
-            updateUserProfile(findUser, updateUserInfoReq.getPictureType(), file);
+        if (updateUserInfoReq.getIsDefault() != null) {
+            updateUserProfile(findUser, updateUserInfoReq.getIsDefault(), file);
         }
 
         UpdateUserInfoRes updateUserInfoRes = UpdateUserInfoRes.builder()
@@ -107,21 +105,18 @@ public class UserService {
         return ResponseEntity.ok(apiResponse);
     }
 
-    private void updateUserProfile(User user, String type, MultipartFile file) {
-        if (Objects.equals(type, PictureType.CUSTOM.toString())) {
+    private void updateUserProfile(User user, Boolean isDefault, MultipartFile file) {
+        if (!isDefault) {
             // 사용자가 직접 프로필을 업로드하는 경우
-            if (user.getPictureType() == PictureType.CUSTOM) {
+            if ((user.getPicture()).contains("amazonaws.com/")) {
                 String originalFile = user.getPicture().split("amazonaws.com/")[1];
                 s3Uploader.deleteFile(originalFile);
             }
             String picture = s3Uploader.uploadImage(file);
-
-            user.updatePictureType("CUSTOM");
             user.updatePicture(picture);
         }
-         else if (Objects.equals(type, PictureType.DEFAULT.toString())) {
+         else {
             // 사용자가 기본 프로필을 설정한 경우
-            user.updatePictureType("DEFAULT");
             user.updatePicture("/img/default_image.png");
         }
     }

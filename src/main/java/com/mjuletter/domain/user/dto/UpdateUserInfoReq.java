@@ -11,5 +11,5 @@ public class UpdateUserInfoReq {
 
     private String instagram;
 
-    private String pictureType;
+    private Boolean isDefault;
 }
