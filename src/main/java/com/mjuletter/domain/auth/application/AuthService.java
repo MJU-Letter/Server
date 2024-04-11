@@ -3,6 +3,8 @@ package com.mjuletter.domain.auth.application;
 import com.mjuletter.domain.auth.domain.Token;
 import com.mjuletter.domain.auth.domain.repository.TokenRepository;
 import com.mjuletter.domain.auth.dto.*;
+import com.mjuletter.domain.s3.application.S3Uploader;
+import com.mjuletter.domain.user.domain.PictureType;
 import com.mjuletter.domain.user.domain.Role;
 import com.mjuletter.domain.user.domain.User;
 import com.mjuletter.domain.user.domain.repository.UserRepository;
@@ -10,6 +12,7 @@ import com.mjuletter.global.DefaultAssert;
 import com.mjuletter.global.config.security.token.UserPrincipal;
 import com.mjuletter.global.payload.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,7 +21,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -30,12 +36,13 @@ public class AuthService {
     private final CustomTokenProviderService customTokenProviderService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final S3Uploader s3Uploader;
 
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
 
     @Transactional
-    public ResponseEntity<?> signUp(SignUpReq signUpReq) {
+    public ResponseEntity<?> signUp(SignUpReq signUpReq, MultipartFile picture) {
 
         User user = User.builder()
                 .email(signUpReq.getEmail())
@@ -43,7 +50,8 @@ public class AuthService {
                 .name(signUpReq.getName())
                 .major(signUpReq.getMajor())
                 .classOf(signUpReq.getClassOf())
-                .picture(setPicture(signUpReq.getPicture()))
+                .picture(setPicture(signUpReq.getPictureType(), picture))
+                .pictureType(PictureType.valueOf(signUpReq.getPictureType()))
                 .instagram(signUpReq.getInstagram())
                 .role(Role.USER)
                 .isReceivedEmail(true)
@@ -59,11 +67,13 @@ public class AuthService {
         return ResponseEntity.ok(apiResponse);
     }
 
-    private String setPicture(String picture) {
-        if (picture == null || picture.isEmpty()) {
-            return "resources/static/img/default_image.png";
+    private String setPicture(String pictureType, MultipartFile picture) {
+        if (pictureType.equals("DEFAULT")) {
+            return "/img/default_image.png";
+        } else if (pictureType.equals("CUSTOM") && !picture.isEmpty()) {
+            return s3Uploader.uploadImage(picture);
         } else {
-            return picture;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 입력입니다.");
         }
     }
 
@@ -183,8 +193,5 @@ public class AuthService {
 
         return ResponseEntity.ok(apiResponse);
     }
-
-    // 이미지 업로드용 메소드
-    // "resources/static/img/default_image.png"
 
 }
