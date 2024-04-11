@@ -46,13 +46,14 @@ public class LetterService {
     }
 
 
+    @Transactional(readOnly = true)
     public ResponseEntity<List<LetterResponse>> getReceivedLetters(Long userId) {
         // 사용자 ID로 사용자 정보 가져오기
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 사용자가 받은 편지 리스트 조회
-        List<Letter> receivedLetters = letterRepository.findByRecipient(user);
+        // 사용자가 받은 편지 리스트 조회 (오래된 순으로 정렬)
+        List<Letter> receivedLetters = letterRepository.findByRecipientOrderByCreatedAtAsc(user);
 
         // 받은 편지 리스트를 LetterResponse 리스트로 변환
         List<LetterResponse> letterResponses = receivedLetters.stream()
@@ -68,13 +69,14 @@ public class LetterService {
         return ResponseEntity.ok(letterResponses);
     }
 
+    @Transactional(readOnly = true)
     public ResponseEntity<List<LetterResponse>> getSentLetters(Long userId) {
         // 사용자 ID로 사용자 정보 가져오기
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 사용자가 보낸 편지 리스트 조회
-        List<Letter> sentLetters = letterRepository.findBySender(user);
+        // 사용자가 보낸 편지 리스트 조회 (오래된 순으로 정렬)
+        List<Letter> sentLetters = letterRepository.findBySenderOrderByCreatedAtAsc(user);
 
         // 보낸 편지 리스트를 LetterResponse 리스트로 변환
         List<LetterResponse> letterResponses = sentLetters.stream()
@@ -89,6 +91,7 @@ public class LetterService {
 
         return ResponseEntity.ok(letterResponses);
     }
+
     @Transactional
     public void deleteSentLetter(Long userId, Long letterId) {
         Letter letter = letterRepository.findById(letterId)
