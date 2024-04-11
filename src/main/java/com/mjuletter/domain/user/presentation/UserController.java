@@ -33,8 +33,8 @@ public class UserController {
     @PatchMapping("/update")
     public ResponseEntity<?> updateUserInfo(@CurrentUser UserPrincipal userPrincipal,
                                             @RequestPart UpdateUserInfoReq updateUserInfoReq,
-                                            @RequestPart MultipartFile file) {
-        return userService.updateUserInfo(userPrincipal, updateUserInfoReq, file);
+                                            @RequestPart MultipartFile picture) {
+        return userService.updateUserInfo(userPrincipal, updateUserInfoReq, picture);
     }
 
     @Operation(summary = "사용자 정보 조회", description = "마이페이지에서 사용자의 정보를 조회합니다.")

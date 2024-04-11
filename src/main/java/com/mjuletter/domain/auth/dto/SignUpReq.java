@@ -26,6 +26,6 @@ public class SignUpReq {
 
     private String instagram;
 
-    private String pictureType;
+    private Boolean isDefault;
 
 }

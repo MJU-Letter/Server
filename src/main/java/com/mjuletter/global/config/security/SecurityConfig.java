@@ -74,7 +74,7 @@ public class SecurityConfig{
                         .permitAll()
                         .requestMatchers("/swagger", "/swagger-ui.html", "/swagger-ui/**", "/api-docs", "/api-docs/**", "/v3/api-docs/**")
                         .permitAll()
-                        .requestMatchers("/auth/**")
+                        .requestMatchers("/auth/**", "/verify/**", "/vision/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated());

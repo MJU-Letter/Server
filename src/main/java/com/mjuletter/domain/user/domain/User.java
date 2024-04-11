@@ -38,10 +38,6 @@ public class User extends BaseEntity {
     @Column(name="role")
     private Role role;
 
-    @Enumerated(EnumType.STRING) // Enum 타입은 문자열 형태로 저장해야 함
-    @Column(name="picture_type")
-    private PictureType pictureType;
-
     @Column(name = "major", nullable = false)
     private String major;
 
@@ -61,18 +57,15 @@ public class User extends BaseEntity {
     private List<Letter> receivedLetters = new ArrayList<>();
 
     @Builder
-    public User(Long id, String name, String email, String password, String picture, Role role, PictureType pictureType, String major, int classOf, String instagram, boolean isReceivedEmail) {
+    public User(Long id, String name, String email, String password, String picture, Role role, String major, int classOf, String instagram, boolean isReceivedEmail) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.picture = picture;
         this.role = role;
-
-        this.pictureType = pictureType;
         this.major=major;
         this.classOf=classOf;
-
         this.instagram = instagram;
         this.isReceivedEmail = isReceivedEmail;
     }
@@ -83,8 +76,6 @@ public class User extends BaseEntity {
 
     public void updateInstagram(String insta) { instagram = insta; }
     public void updatePicture(String file) { picture = file; }
-
-    public void updatePictureType(String type) { pictureType = PictureType.valueOf(type); }
     public void updateReceivedEmail(boolean receivedEmail) {
         isReceivedEmail = receivedEmail;
     }
