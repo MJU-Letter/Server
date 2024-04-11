@@ -3,6 +3,8 @@ package com.mjuletter.domain.letter.application;
 import com.mjuletter.domain.letter.domain.Letter;
 import com.mjuletter.domain.letter.domain.repository.LetterRepository;
 import com.mjuletter.domain.letter.dto.response.LetterResponse;
+import com.mjuletter.domain.notification.application.NotificationService;
+import com.mjuletter.domain.notification.domain.Notification;
 import com.mjuletter.domain.user.domain.User;
 import com.mjuletter.domain.user.domain.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,6 +23,7 @@ public class LetterService {
 
     private final LetterRepository letterRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public void writeLetter(String content, Long recipientId, Long senderId, boolean anonymous) {
@@ -37,7 +40,9 @@ public class LetterService {
                 .anonymous(anonymous) // 익명 여부 설정
                 .build();
 
-        letterRepository.save(letter);
+        letterRepository.save(letter); // 편지를 먼저 저장합니다.
+        notificationService.createNotification(recipient,sender); // 알림을 생성합니다.
+
     }
 
 
