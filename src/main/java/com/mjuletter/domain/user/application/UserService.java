@@ -8,6 +8,7 @@ import com.mjuletter.domain.user.dto.UpdateUserInfoRes;
 import com.mjuletter.domain.user.dto.UserInfoRes;
 import com.mjuletter.domain.user.dto.response.RandomUserResponse;
 import com.mjuletter.domain.user.dto.response.RelatedUserResponse;
+import com.mjuletter.domain.user.dto.response.UserProfileResponse;
 import com.mjuletter.global.DefaultAssert;
 import com.mjuletter.global.config.security.token.UserPrincipal;
 import com.mjuletter.global.payload.ApiResponse;
@@ -74,6 +75,31 @@ public class UserService {
 
         return ResponseEntity.ok(apiResponse);
     }
+
+    public List<UserProfileResponse> searchUsersByName(String name) {
+        List<User> users = userRepository.findByNameContainingIgnoreCase(name);
+        return users.stream()
+                .map(user -> new UserProfileResponse(
+                        user.getName(),
+                        user.getPicture(),
+                        user.getMajor(),
+                        user.getClassOf()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<UserProfileResponse> searchUsersByMajor(String major) {
+        List<User> users = userRepository.findByMajorContainingIgnoreCase(major);
+        return users.stream()
+                .map(user -> new UserProfileResponse(
+                        user.getName(),
+                        user.getPicture(),
+                        user.getMajor(),
+                        user.getClassOf()
+                ))
+                .collect(Collectors.toList());
+    }
+
 
     // 프로필 수정
     @Transactional
