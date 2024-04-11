@@ -1,14 +1,18 @@
 package com.mjuletter.domain.user.domain;
 
 import com.mjuletter.domain.common.BaseEntity;
+import com.mjuletter.domain.letter.domain.Letter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
-@Table(name="user")
+@Table(name="User")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class User extends BaseEntity {
@@ -46,6 +50,12 @@ public class User extends BaseEntity {
     @Column(name = "is_received_email")
     private boolean isReceivedEmail;
 
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Letter> sentLetters = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Letter> receivedLetters = new ArrayList<>();
+
     @Builder
     public User(Long id, String name, String email, String password, String picture, Role role, String major, int classOf, String instagram, boolean isReceivedEmail) {
         this.id = id;
@@ -54,11 +64,12 @@ public class User extends BaseEntity {
         this.password = password;
         this.picture = picture;
         this.role = role;
-        this.major=major;
-        this.classOf=classOf;
+        this.major = major;
+        this.classOf = classOf;
         this.instagram = instagram;
         this.isReceivedEmail = isReceivedEmail;
     }
+
     public String getRoleKey() {
         return this.role.getKey();
     }
