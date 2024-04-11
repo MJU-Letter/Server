@@ -42,4 +42,12 @@ public class LetterController {
         return letterService.getReceivedLetters(userPrincipal.getId());
     }
 
+    @Operation(summary = "사용자가 보낸 편지 리스트 조회", description = "사용자가 보낸 편지 리스트를 조회합니다.")
+    @GetMapping("/sent")
+    public ResponseEntity<List<LetterResponse>> getSentLetters(@CurrentUser UserPrincipal userPrincipal) {
+        // 현재 인증된 사용자의 ID를 가져와서 사용자가 보낸 편지 리스트를 조회합니다.
+        return letterService.getSentLetters(userPrincipal.getId());
+    }
+
+
 }

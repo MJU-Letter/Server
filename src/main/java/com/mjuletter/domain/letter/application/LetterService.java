@@ -49,22 +49,39 @@ public class LetterService {
 
         // 받은 편지 리스트를 LetterResponse 리스트로 변환
         List<LetterResponse> letterResponses = receivedLetters.stream()
-                .map(letter -> {
-                    LetterResponse response = new LetterResponse();
-                    response.setId(letter.getId());
-                    response.setContent(letter.getContent());
-                    response.setRecipientName(user.getName());
-                    response.setAnonymous(letter.isAnonymous());
-
-                    if (!letter.isAnonymous() && letter.getSender() != null) {
-                        response.setSenderProfileImage(letter.getSender().getPicture());
-                    }
-
-                    return response;
-                })
+                .map(letter -> new LetterResponse(
+                        letter.getId(),
+                        letter.getContent(),
+                        letter.isAnonymous(),
+                        user.getName(),
+                        letter.getSender().getPicture()
+                ))
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(letterResponses);
     }
+
+    public ResponseEntity<List<LetterResponse>> getSentLetters(Long userId) {
+        // 사용자 ID로 사용자 정보 가져오기
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 사용자가 보낸 편지 리스트 조회
+        List<Letter> sentLetters = letterRepository.findBySender(user);
+
+        // 보낸 편지 리스트를 LetterResponse 리스트로 변환
+        List<LetterResponse> letterResponses = sentLetters.stream()
+                .map(letter -> new LetterResponse(
+                        letter.getId(),
+                        letter.getContent(),
+                        false, // 익명 여부는 보낸 편지에서는 항상 false
+                        letter.getRecipient().getName(),
+                        letter.getRecipient().getPicture()
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(letterResponses);
+    }
+
 }
 
