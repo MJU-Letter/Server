@@ -1,4 +1,4 @@
-package com.mjuletter.domain.user.dto.respnse;
+package com.mjuletter.domain.user.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RelatedUserResponse {
     private Long id;
-    private String image;
+    private String picture;
     private String name;
-
     private String major;
     private int classOf;
 

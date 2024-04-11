@@ -1,8 +1,8 @@
 package com.mjuletter.domain.user.presentation;
 
 import com.mjuletter.domain.user.application.UserService;
-import com.mjuletter.domain.user.dto.respnse.RandomUserResponse;
-import com.mjuletter.domain.user.dto.respnse.RelatedUserResponse;
+import com.mjuletter.domain.user.dto.response.RandomUserResponse;
+import com.mjuletter.domain.user.dto.response.RelatedUserResponse;
 import com.mjuletter.global.config.security.token.CurrentUser;
 import com.mjuletter.global.config.security.token.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,18 +46,18 @@ public class UserController {
     }
 
     @Operation(summary = "나와 관련된 유저 목록 출력", description = "최신 10명의 롤링페이퍼 작성자를 출력하는 API")
-    @GetMapping("/related-users")
-    public List<RelatedUserResponse> getLatestRollingPaperWriters(@CurrentUser UserPrincipal userPrincipal) {
-        List<RelatedUserResponse> latestUsers = userService.getLatestRollingPaperWriters(userPrincipal.getId(),10);
-        return (List<RelatedUserResponse>) new ResponseEntity<>(latestUsers, HttpStatus.OK);
+    @GetMapping("/related")
+    public ResponseEntity<List<RelatedUserResponse>> getLatestRollingPaperWriters(@CurrentUser UserPrincipal userPrincipal) {
+        List<RelatedUserResponse> latestUsers = userService.getLatestRollingPaperWriters(userPrincipal.getId(), 10);
+        return new ResponseEntity<>(latestUsers, HttpStatus.OK);
     }
 
     // 일반 사용자들을 랜덤으로 모두 출력하는 API
     @Operation(summary = "랜덤 유저 목록 출력", description = "일반 사용자들을 랜덤으로 모두 출력하는 API")
-    @GetMapping("/random-users")
-    public List<RandomUserResponse> getRandomUsers(@CurrentUser UserPrincipal userPrincipal) {
+    @GetMapping("/random")
+    public ResponseEntity<List<RandomUserResponse>> getRandomUsers(@CurrentUser UserPrincipal userPrincipal) {
         List<RandomUserResponse> randomUsers = userService.getRandomUsers(userPrincipal.getId());
-        return (List<RandomUserResponse>) new ResponseEntity<>(randomUsers, HttpStatus.OK);
+        return new ResponseEntity<>(randomUsers, HttpStatus.OK);
     }
 
 }

@@ -3,8 +3,8 @@ package com.mjuletter.domain.user.application;
 import com.mjuletter.domain.user.domain.User;
 import com.mjuletter.domain.user.domain.repository.UserRepository;
 import com.mjuletter.domain.user.dto.UserInfoRes;
-import com.mjuletter.domain.user.dto.respnse.RandomUserResponse;
-import com.mjuletter.domain.user.dto.respnse.RelatedUserResponse;
+import com.mjuletter.domain.user.dto.response.RandomUserResponse;
+import com.mjuletter.domain.user.dto.response.RelatedUserResponse;
 import com.mjuletter.global.DefaultAssert;
 import com.mjuletter.global.config.security.token.UserPrincipal;
 import com.mjuletter.global.payload.ApiResponse;
@@ -100,14 +100,26 @@ public class UserService {
     public List<RelatedUserResponse> getLatestRollingPaperWriters(Long userId, int count) {
         List<RelatedUserResponse> latestUsers = userRepository.findLatestRollingPaperWriters(userId, count);
         return latestUsers.stream()
-                .map(user -> new RelatedUserResponse(user.getId(), user.getImage(), user.getName(), user.getMajor(), user.getClassOf())) // 예시로 User의 일부 속성을 사용
+                .map(user -> RelatedUserResponse.builder()
+                        .id(user.getId())
+                        .picture(user.getPicture())
+                        .name(user.getName())
+                        .major(user.getMajor())
+                        .classOf(user.getClassOf())
+                        .build())
                 .collect(Collectors.toList());
     }
 
     public List<RandomUserResponse> getRandomUsers(Long userId) {
         List<RandomUserResponse> randomUsers = userRepository.findRandomUsers(userId);
         return randomUsers.stream()
-                .map(user -> new RandomUserResponse(user.getId(), user.getImage(), user.getName(), user.getMajor(), user.getClassOf())) // 예시로 User의 일부 속성을 사용
+                .map(user -> RandomUserResponse.builder()
+                        .id(user.getId())
+                        .picture(user.getPicture())
+                        .name(user.getName())
+                        .major(user.getMajor())
+                        .classOf(user.getClassOf())
+                        .build())
                 .collect(Collectors.toList());
     }
 
