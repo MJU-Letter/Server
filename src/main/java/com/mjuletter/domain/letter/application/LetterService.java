@@ -5,8 +5,10 @@ import com.mjuletter.domain.letter.domain.repository.LetterRepository;
 import com.mjuletter.domain.letter.dto.response.LetterResponse;
 import com.mjuletter.domain.user.domain.User;
 import com.mjuletter.domain.user.domain.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,6 +84,34 @@ public class LetterService {
 
         return ResponseEntity.ok(letterResponses);
     }
+    @Transactional
+    public void deleteSentLetter(Long userId, Long letterId) {
+        Letter letter = letterRepository.findById(letterId)
+                .orElseThrow(() -> new EntityNotFoundException("Letter not found"));
+
+        // Check if the logged-in user is the sender of the letter
+        if (!userId.equals(letter.getSender().getId())) {
+            throw new AccessDeniedException("You are not authorized to delete this letter");
+        }
+
+        // Delete the letter
+        letterRepository.delete(letter);
+    }
+
+    @Transactional
+    public void deleteReceivedLetter(Long userId, Long letterId) {
+        Letter letter = letterRepository.findById(letterId)
+                .orElseThrow(() -> new EntityNotFoundException("Letter not found"));
+
+        // Check if the logged-in user is the recipient of the letter
+        if (!userId.equals(letter.getRecipient().getId())) {
+            throw new AccessDeniedException("You are not authorized to delete this letter");
+        }
+
+        // Delete the letter
+        letterRepository.delete(letter);
+    }
+
 
 }
 
