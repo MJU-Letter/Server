@@ -48,6 +48,20 @@ public class LetterController {
         // 현재 인증된 사용자의 ID를 가져와서 사용자가 보낸 편지 리스트를 조회합니다.
         return letterService.getSentLetters(userPrincipal.getId());
     }
+    @Operation(summary = "내가 쓴 롤링페이퍼 삭제", description = "내가 쓴 롤링페이퍼를 삭제하는 API")
+    @DeleteMapping("/sent/{letterId}")
+    public ResponseEntity<ApiResponse> deleteSentLetter(@CurrentUser UserPrincipal userPrincipal, @PathVariable Long letterId) {
+        letterService.deleteSentLetter(userPrincipal.getId(), letterId);
+        return ResponseEntity.ok(new ApiResponse(true, "내가 쓴 롤링페이퍼가 삭제되었습니다."));
+    }
+
+    @Operation(summary = "내가 받은 롤링페이퍼 삭제", description = "내가 받은 롤링페이퍼를 삭제하는 API")
+    @DeleteMapping("/received/{letterId}")
+    public ResponseEntity<ApiResponse> deleteReceivedLetter(@CurrentUser UserPrincipal userPrincipal, @PathVariable Long letterId) {
+        letterService.deleteReceivedLetter(userPrincipal.getId(), letterId);
+        return ResponseEntity.ok(new ApiResponse(true, "내가 받은 롤링페이퍼가 삭제되었습니다."));
+    }
+
 
 
 }
