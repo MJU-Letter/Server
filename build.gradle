@@ -51,6 +51,13 @@ dependencies {
     // AWS S3
     implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
 
+    // Google Cloud Vision API 클라이언트 라이브러리
+    implementation 'com.google.cloud:google-cloud-vision:3.34.0'
+
+    // gcp storage
+    implementation 'org.springframework.cloud:spring-cloud-gcp-starter:1.2.8.RELEASE'
+    implementation 'org.springframework.cloud:spring-cloud-gcp-storage:1.2.8.RELEASE'
+
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
