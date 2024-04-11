@@ -6,6 +6,8 @@ import com.mjuletter.domain.user.domain.repository.UserRepository;
 import com.mjuletter.domain.user.dto.UpdateUserInfoReq;
 import com.mjuletter.domain.user.dto.UpdateUserInfoRes;
 import com.mjuletter.domain.user.dto.UserInfoRes;
+import com.mjuletter.domain.user.dto.response.RandomUserResponse;
+import com.mjuletter.domain.user.dto.response.RelatedUserResponse;
 import com.mjuletter.global.DefaultAssert;
 import com.mjuletter.global.config.security.token.UserPrincipal;
 import com.mjuletter.global.payload.ApiResponse;
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -154,5 +158,30 @@ public class UserService {
         return ResponseEntity.ok(apiResponse);
     }
 
+    public List<RelatedUserResponse> getLatestRollingPaperWriters(Long userId, int count) {
+        List<RelatedUserResponse> latestUsers = userRepository.findLatestRollingPaperWriters(userId, count);
+        return latestUsers.stream()
+                .map(user -> RelatedUserResponse.builder()
+                        .id(user.getId())
+                        .picture(user.getPicture())
+                        .name(user.getName())
+                        .major(user.getMajor())
+                        .classOf(user.getClassOf())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    public List<RandomUserResponse> getRandomUsers(Long userId) {
+        List<RandomUserResponse> randomUsers = userRepository.findRandomUsers(userId);
+        return randomUsers.stream()
+                .map(user -> RandomUserResponse.builder()
+                        .id(user.getId())
+                        .picture(user.getPicture())
+                        .name(user.getName())
+                        .major(user.getMajor())
+                        .classOf(user.getClassOf())
+                        .build())
+                .collect(Collectors.toList());
+    }
 
 }
