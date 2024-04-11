@@ -7,6 +7,7 @@ import com.mjuletter.domain.user.dto.response.RelatedUserResponse;
 
 import com.mjuletter.domain.user.dto.UpdateUserInfoReq;
 
+import com.mjuletter.domain.user.dto.response.UserProfileResponse;
 import com.mjuletter.global.config.security.token.CurrentUser;
 import com.mjuletter.global.config.security.token.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
@@ -74,6 +75,18 @@ public class UserController {
     public ResponseEntity<List<RandomUserResponse>> getRandomUsers(@CurrentUser UserPrincipal userPrincipal) {
         List<RandomUserResponse> randomUsers = userService.getRandomUsers(userPrincipal.getId());
         return new ResponseEntity<>(randomUsers, HttpStatus.OK);
+    }
+    @Operation(summary = "유저 이름으로 검색", description = "일반 사용자들을 이름으로 검색하는 API")
+    @GetMapping("/name")
+    public ResponseEntity<List<UserProfileResponse>> searchUsersByName(@RequestParam String name) {
+        List<UserProfileResponse> users = userService.searchUsersByName(name);
+        return ResponseEntity.ok(users);
+    }
+    @Operation(summary = "유저 학과명으로 검색", description = "일반 사용자들을 학과명으로 검색하는 API")
+    @GetMapping("/major")
+    public ResponseEntity<List<UserProfileResponse>> searchUsersByMajor(@RequestParam String major) {
+        List<UserProfileResponse> users = userService.searchUsersByMajor(major);
+        return ResponseEntity.ok(users);
     }
 
 }

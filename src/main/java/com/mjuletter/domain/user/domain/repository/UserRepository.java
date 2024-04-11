@@ -16,6 +16,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
     boolean existsByName(String name);
 
+    List<User> findByNameContainingIgnoreCase(String name);
+    List<User> findByMajorContainingIgnoreCase(String major);
 
     @Query(value = "SELECT new com.mjuletter.domain.user.dto.response.RelatedUserResponse(u.id, u.picture, u.name, u.major, u.classOf) FROM User u WHERE u.id != ?1 ORDER BY u.createdAt DESC")
     List<RelatedUserResponse> findLatestRollingPaperWriters(Long userId, int count);
