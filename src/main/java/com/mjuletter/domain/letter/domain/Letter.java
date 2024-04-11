@@ -9,7 +9,6 @@ import lombok.*;
 @Table(name = "Letter")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-@Setter
 public class Letter extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
