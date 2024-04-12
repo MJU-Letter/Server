@@ -2,7 +2,8 @@ package com.mjuletter.domain.letter.presentation;
 
 import com.mjuletter.domain.letter.application.LetterService;
 import com.mjuletter.domain.letter.dto.request.LetterRequest;
-import com.mjuletter.domain.letter.dto.response.LetterResponse;
+import com.mjuletter.domain.letter.dto.response.ReceivedLetterResponse;
+import com.mjuletter.domain.letter.dto.response.SentLetterResponse;
 import com.mjuletter.global.config.security.token.CurrentUser;
 import com.mjuletter.global.config.security.token.UserPrincipal;
 import com.mjuletter.global.payload.ApiResponse;
@@ -38,13 +39,13 @@ public class LetterController {
 
     @Operation(summary = "사용자가 받은 편지 리스트 조회", description = "사용자가 받은 편지 리스트를 조회합니다.")
     @GetMapping("/")
-    public ResponseEntity<List<LetterResponse>> getReceivedLetters(@CurrentUser UserPrincipal userPrincipal) {
+    public ResponseEntity<List<ReceivedLetterResponse>> getReceivedLetters(@CurrentUser UserPrincipal userPrincipal) {
         return letterService.getReceivedLetters(userPrincipal.getId());
     }
 
     @Operation(summary = "사용자가 보낸 편지 리스트 조회", description = "사용자가 보낸 편지 리스트를 조회합니다.")
     @GetMapping("/sent")
-    public ResponseEntity<List<LetterResponse>> getSentLetters(@CurrentUser UserPrincipal userPrincipal) {
+    public ResponseEntity<List<SentLetterResponse>> getSentLetters(@CurrentUser UserPrincipal userPrincipal) {
         // 현재 인증된 사용자의 ID를 가져와서 사용자가 보낸 편지 리스트를 조회합니다.
         return letterService.getSentLetters(userPrincipal.getId());
     }
