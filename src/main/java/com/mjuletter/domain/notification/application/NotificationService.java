@@ -1,6 +1,5 @@
 package com.mjuletter.domain.notification.application;
 
-import com.mjuletter.domain.letter.dto.response.LetterResponse;
 import com.mjuletter.domain.notification.domain.Notification;
 import com.mjuletter.domain.notification.domain.repository.NotificationRepository;
 import com.mjuletter.domain.notification.dto.response.NotificationResponse;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
