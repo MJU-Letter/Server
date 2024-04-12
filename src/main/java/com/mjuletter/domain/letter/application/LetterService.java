@@ -2,9 +2,9 @@ package com.mjuletter.domain.letter.application;
 
 import com.mjuletter.domain.letter.domain.Letter;
 import com.mjuletter.domain.letter.domain.repository.LetterRepository;
-import com.mjuletter.domain.letter.dto.response.LetterResponse;
+import com.mjuletter.domain.letter.dto.response.ReceivedLetterResponse;
+import com.mjuletter.domain.letter.dto.response.SentLetterResponse;
 import com.mjuletter.domain.notification.application.NotificationService;
-import com.mjuletter.domain.notification.domain.Notification;
 import com.mjuletter.domain.user.domain.User;
 import com.mjuletter.domain.user.domain.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -47,7 +47,7 @@ public class LetterService {
 
 
     @Transactional(readOnly = true)
-    public ResponseEntity<List<LetterResponse>> getReceivedLetters(Long userId) {
+    public ResponseEntity<List<ReceivedLetterResponse>> getReceivedLetters(Long userId) {
         // 사용자 ID로 사용자 정보 가져오기
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -56,8 +56,8 @@ public class LetterService {
         List<Letter> receivedLetters = letterRepository.findByRecipientOrderByCreatedAtAsc(user);
 
         // 받은 편지 리스트를 LetterResponse 리스트로 변환
-        List<LetterResponse> letterResponses = receivedLetters.stream()
-                .map(letter -> new LetterResponse(
+        List<ReceivedLetterResponse> letterResponses = receivedLetters.stream()
+                .map(letter -> new ReceivedLetterResponse(
                         letter.getId(),
                         letter.getContent(),
                         letter.isAnonymous(),
@@ -70,7 +70,7 @@ public class LetterService {
     }
 
     @Transactional(readOnly = true)
-    public ResponseEntity<List<LetterResponse>> getSentLetters(Long userId) {
+    public ResponseEntity<List<SentLetterResponse>> getSentLetters(Long userId) {
         // 사용자 ID로 사용자 정보 가져오기
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -79,8 +79,8 @@ public class LetterService {
         List<Letter> sentLetters = letterRepository.findBySenderOrderByCreatedAtAsc(user);
 
         // 보낸 편지 리스트를 LetterResponse 리스트로 변환
-        List<LetterResponse> letterResponses = sentLetters.stream()
-                .map(letter -> new LetterResponse(
+        List<SentLetterResponse> letterResponses = sentLetters.stream()
+                .map(letter -> new SentLetterResponse(
                         letter.getId(),
                         letter.getContent(),
                         false, // 익명 여부는 보낸 편지에서는 항상 false
@@ -101,7 +101,6 @@ public class LetterService {
         if (!userId.equals(letter.getSender().getId())) {
             throw new AccessDeniedException("You are not authorized to delete this letter");
         }
-
         // Delete the letter
         letterRepository.delete(letter);
     }
