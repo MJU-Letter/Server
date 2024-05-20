@@ -1,4 +1,4 @@
-package com.mjuletter.global.common;
+package com.mjuletter.domain.common;
 
 public enum Status {
     ACTIVE, DELETE
