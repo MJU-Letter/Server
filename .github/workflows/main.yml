@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Set up JDK 11
+    - name: Set up JDK 17
       uses: actions/setup-java@v2
       with:
         java-version: '17'
@@ -28,14 +28,22 @@ jobs:
     
     - name: Build with Gradle
       run: ./gradlew clean build
-
     
     - name: Set YML
       run: |
         mkdir -p src/main/resources
         echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
         find src
-      
+    
+    # .env 파일 생성
+    - name: Create .env file
+      run: |
+        echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+        echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
+        echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> .env
+        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+        echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+    
     # 디렉토리 생성
     - name: Make Directory
       run: mkdir -p deploy
@@ -57,4 +65,3 @@ jobs:
 
     - name: Upload to S3
       run: aws s3 cp --region ap-northeast-2 ./mjuletter.zip s3://mjuletter/
-
