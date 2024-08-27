@@ -58,6 +58,9 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-gcp-starter:1.2.8.RELEASE'
     implementation 'org.springframework.cloud:spring-cloud-gcp-storage:1.2.8.RELEASE'
 
+    //.env
+    implementation 'io.github.cdimascio:dotenv-java:2.2.0'
+
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
