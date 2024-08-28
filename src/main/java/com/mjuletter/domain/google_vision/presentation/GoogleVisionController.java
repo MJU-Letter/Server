@@ -16,7 +16,7 @@ public class GoogleVisionController {
 
     private final GoogleVisionService googleVisionService;
 
-    @GetMapping("/extract-text")
+    @PostMapping("/extract-text")
     public ResponseEntity<?> extractText(@RequestPart MultipartFile image) throws IOException {
             // Google Vision Service를 사용하여 이미지에서 텍스트 추출
             return googleVisionService.detectTextGcs(image);
