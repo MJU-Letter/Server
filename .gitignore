@@ -35,4 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
-/resources/mjuletter-419917-a65a042c0d62.json
+
+### YML ###
+/src/main/resources/application.yml
