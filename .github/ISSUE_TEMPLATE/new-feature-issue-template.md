@@ -1,17 +1,18 @@
 ---
-name: New Feature issue template
-about: New Feature issue template
-title: 새로운 기능 구현
+name: "✅Feature Template"
+about: 기능 추가 이슈 템플릿
+title: "[FEAT]"
 labels: ''
 assignees: ''
 
 ---
 
-## Feature Description
+## 📑Summary
+> 어떤 기능인가요?
+-
+## ✏️Task & Description
+> 상세 작업 내용을 설명해주세요.
+-
 
-## Feature Requirements
-- [ ] req1
-- [ ] req2
-- [ ] req3
-
-## To be noted
+## 💡Reference
+-
