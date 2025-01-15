@@ -63,6 +63,9 @@ public class LetterController {
         return ResponseEntity.ok(new ApiResponse(true, "내가 받은 롤링페이퍼가 삭제되었습니다."));
     }
 
-
-
+    @Operation(summary = "다른 유저의 편지 조회", description = "다른 유저의 편지를 조회하는 API")
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getOtherUserLetters(@CurrentUser UserPrincipal userPrincipal, @PathVariable Long userId) {
+        return letterService.getOtherReceivedLetters(userPrincipal, userId);
+    }
 }

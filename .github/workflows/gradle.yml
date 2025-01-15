@@ -1,0 +1,49 @@
+name: Java CI with Gradle
+
+on:
+  pull_request:
+    branches: 
+      - '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Setup MySQL
+      uses: samin/mysql-action@v1
+      with:
+        character set server: 'utf8'
+        mysql database: ${{ secrets.MYSQL_DB }}
+        mysql user: ${{ secrets.MYSQL_USER }}
+        mysql password: ${{ secrets.MYSQL_PASSWORD }}
+
+    - name: Wait for MySQL to be ready
+      run: |
+        until mysqladmin ping -h localhost --silent; do
+          echo "Waiting for MySQL to be ready..."
+          sleep 1
+        done
+
+    - name: Create YML File
+      run: |
+        echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+
+    - name: Build with Gradle Wrapper
+      run: ./gradlew clean build

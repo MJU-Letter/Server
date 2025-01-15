@@ -7,6 +7,8 @@ import com.mjuletter.domain.letter.dto.response.SentLetterResponse;
 import com.mjuletter.domain.notification.application.NotificationService;
 import com.mjuletter.domain.user.domain.User;
 import com.mjuletter.domain.user.domain.repository.UserRepository;
+import com.mjuletter.global.config.security.token.UserPrincipal;
+import com.mjuletter.global.payload.ApiResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -110,15 +112,40 @@ public class LetterService {
         Letter letter = letterRepository.findById(letterId)
                 .orElseThrow(() -> new EntityNotFoundException("Letter not found"));
 
-        // Check if the logged-in user is the recipient of the letter
         if (!userId.equals(letter.getRecipient().getId())) {
             throw new AccessDeniedException("You are not authorized to delete this letter");
         }
-
-        // Delete the letter
         letterRepository.delete(letter);
     }
 
 
+    public ResponseEntity<?> getOtherReceivedLetters(UserPrincipal userPrincipal, Long userId) {
+        User user= userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        User otherUser = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        // otherUser가 받은 편지 리스트 조회 (오래된 순으로 정렬)
+        List<Letter> receivedLetters = letterRepository.findByRecipientOrderByCreatedAtAsc(otherUser);
+
+        List<ReceivedLetterResponse> letterResponses = receivedLetters.stream()
+                .map(letter -> new ReceivedLetterResponse(
+                        letter.getId(),
+                        letter.getContent(),
+                        letter.isAnonymous(),
+                        user.getName(),
+                        letter.getSender().getPicture()
+                ))
+                .toList();
+
+        ApiResponse response = ApiResponse.builder()
+                .check(true)
+                .information(letterResponses)
+                .build();
+
+        return ResponseEntity.ok(response);
+
+    }
 }
 

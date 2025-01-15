@@ -1,20 +1,25 @@
+## 📝작업 내용
+> 이번 PR에서 작업한 내용을 간략히 설명해주세요
+- 
 
-name: PULL_REQUEST_TEMPLATE
 
-about: Suggest an idea for this project
-title: "[FEAT] 기능 구현"
-labels: ''
-assignees: ''
+## 💬참고 사항
+> 코드에서 확인해야 하는 부분을 명시합니다
+-
 
----
 
-## Description
-
-## To be noted
-
-## issue number
-
-## Checklist
+## ✅Check
+- [ ] 각 기능에 대한 테스트
 - [ ] label
-- [ ] issue number
-- [ ] conflict resolve
+- [ ] develop branch pull
+
+
+
+## #️⃣연관된 이슈
+> ex) #이슈번호
+-
+
+
+## 💡References(선택)
+> 작업하면서 참고한 레퍼런스가 있다면 첨부해주세요
+- 
