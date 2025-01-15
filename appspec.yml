@@ -17,9 +17,6 @@ hooks:
     - location: scripts/stop.sh
       timeout: 60
       runas: ubuntu
-    - location: scripts/setup_env.sh  # 환경 변수 설정 스크립트 추가
-      timeout: 60
-      runas: ubuntu
   ApplicationStart:
     - location: scripts/start.sh
       timeout: 60
