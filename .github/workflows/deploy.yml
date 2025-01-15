@@ -46,12 +46,10 @@ jobs:
       # 파일 생성
       - name: Create YML File
         run: |
-          mkdir -p ./src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
 
           # KEYSTORE
-          touch ./keystore.p12
-          echo "${{ secrets.KEYSTORE }}" | base64 --decode > ./keystore.p12
+          # echo "${{ secrets.KEYSTORE }}" | base64 --decode > src/main/resources/keystore.p12
 
       # 권한 부여
       - name: Grant execute permission for gradlew
